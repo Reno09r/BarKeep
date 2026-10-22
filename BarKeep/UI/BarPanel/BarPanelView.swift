@@ -1,37 +1,24 @@
 import SwiftUI
 
+@MainActor
 struct BarPanelView: View {
     let items: [MenuBarItem]
     let imageProvider: (MenuBarItem) -> NSImage?
     let onActivate: (MenuBarItem) -> Void
+    let onHideApp: (MenuBarItem) -> Void
+    let onQuitApp: (_ item: MenuBarItem, _ force: Bool) -> Void
     let onClose: () -> Void
 
     @State private var query = ""
     @FocusState private var searchFocused: Bool
 
-    private var filteredItems: [MenuBarItem] {
-        guard !query.isEmpty else { return items }
-        return items.filter { $0.displayName.localizedCaseInsensitiveContains(query) }
-    }
-
     var body: some View {
         HStack(spacing: 8) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 3) {
-                    if filteredItems.isEmpty {
-                        Text("Ничего не найдено")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 10)
-                    } else {
-                        ForEach(filteredItems) { item in
-                            iconButton(for: item)
-                        }
-                    }
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
+            HorizontalIconScrollView(contentWidth: rowWidth) {
+                iconRow
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(height: 44)
 
             Divider()
                 .frame(height: 26)
@@ -46,12 +33,46 @@ struct BarPanelView: View {
                 .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
         )
         .padding(1)
-        .onAppear { searchFocused = true }
+        .onAppear {
+            // Панель становится key уже после появления окна.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                searchFocused = true
+            }
+        }
         .onExitCommand { onClose() }
     }
 
+    // MARK: - Иконки
+
+    private var iconRow: some View {
+        HStack(spacing: 3) {
+            if filteredItems.isEmpty {
+                Text("Ничего не найдено")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 10)
+            } else {
+                ForEach(filteredItems) { item in
+                    iconButton(for: item)
+                }
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Ширина ряда: 34 pt иконка + 3 pt отступ + 16 pt поля.
+    private var rowWidth: CGFloat {
+        filteredItems.isEmpty ? 150 : CGFloat(filteredItems.count) * 37 + 13
+    }
+
     private func iconButton(for item: MenuBarItem) -> some View {
-        Button {
+        let canManage = AppTerminator.canManage(item: item)
+        let appName = AppTerminator.displayName(for: item)
+
+        return Button {
             onActivate(item)
         } label: {
             ZStack {
@@ -75,7 +96,31 @@ struct BarPanelView: View {
         }
         .buttonStyle(.plain)
         .help(item.displayName)
+        .contextMenu {
+            Button("Активировать") {
+                onActivate(item)
+            }
+
+            Button("Скрыть \(appName)") {
+                onHideApp(item)
+            }
+            .disabled(!canManage)
+
+            Divider()
+
+            Button("Завершить \(appName)…") {
+                onQuitApp(item, false)
+            }
+            .disabled(!canManage)
+
+            Button("Завершить принудительно…") {
+                onQuitApp(item, true)
+            }
+            .disabled(!canManage)
+        }
     }
+
+    // MARK: - Поиск
 
     private var searchField: some View {
         HStack(spacing: 6) {
@@ -108,5 +153,80 @@ struct BarPanelView: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color.primary.opacity(0.07))
         )
+    }
+
+    private var filteredItems: [MenuBarItem] {
+        let tokens = Self.normalized(query)
+            .split(separator: " ")
+            .map(String.init)
+            .filter { !$0.isEmpty }
+        guard !tokens.isEmpty else { return items }
+
+        return items.filter { item in
+            let haystack = Self.searchText(for: item)
+            let transliterated = Self.transliterate(haystack)
+            return tokens.allSatisfy { token in
+                let variants = [token, Self.transliterate(token)]
+                return variants.contains { variant in
+                    !variant.isEmpty && (haystack.contains(variant) || transliterated.contains(variant))
+                }
+            }
+        }
+    }
+
+    private static func searchText(for item: MenuBarItem) -> String {
+        [
+            item.displayName,
+            item.ownerName,
+            item.title ?? "",
+            item.bundleIdentifier ?? "",
+        ]
+        .joined(separator: " ")
+        .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+    }
+
+    /// Простая транслитерация, чтобы «телеграм» находил Telegram, а «telegram» — Телеграм.
+    private static func transliterate(_ value: String) -> String {
+        var result = ""
+        result.reserveCapacity(value.count)
+        for character in value {
+            switch character {
+            case "а": result += "a"
+            case "б": result += "b"
+            case "в": result += "v"
+            case "г": result += "g"
+            case "д": result += "d"
+            case "е", "ё", "э": result += "e"
+            case "ж": result += "zh"
+            case "з": result += "z"
+            case "и", "й": result += "i"
+            case "к": result += "k"
+            case "л": result += "l"
+            case "м": result += "m"
+            case "н": result += "n"
+            case "о": result += "o"
+            case "п": result += "p"
+            case "р": result += "r"
+            case "с": result += "s"
+            case "т": result += "t"
+            case "у": result += "u"
+            case "ф": result += "f"
+            case "х": result += "h"
+            case "ц": result += "ts"
+            case "ч": result += "ch"
+            case "ш": result += "sh"
+            case "щ": result += "sch"
+            case "ъ", "ь": result += ""
+            case "ы": result += "y"
+            case "ю": result += "yu"
+            case "я": result += "ya"
+            default: result.append(character)
+            }
+        }
+        return result
     }
 }
