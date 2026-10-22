@@ -1,0 +1,14 @@
+# XcodeGen генерирует проект из project.yml
+BarKeep.xcodeproj/
+
+# Сборка
+build/
+.build/
+DerivedData/
+*.xcresult
+
+# macOS
+.DS_Store
+
+# Личные заметки
+notes/
