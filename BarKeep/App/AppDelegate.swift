@@ -49,13 +49,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Log.warning("Обнаружен другой менеджер меню-бара: \(conflict). Возможны конфликты при скрытии иконок.")
         }
 
-        if !permissions.accessibility {
+        if !permissions.accessibility, !isRunningTests {
             Log.warning("Нет доступа к Accessibility — активация иконок будет ограничена.")
             startPermissionPollingIfNeeded()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.showAccessibilityOnboarding()
             }
         }
+    }
+
+    private var isRunningTests: Bool {
+        NSClassFromString("XCTestCase") != nil ||
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil ||
+        ProcessInfo.processInfo.environment["XCTestBundlePath"] != nil
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -147,6 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showAccessibilityOnboarding() {
+        guard !isRunningTests else { return }
         NSApp.activate(ignoringOtherApps: true)
 
         let alert = NSAlert()
