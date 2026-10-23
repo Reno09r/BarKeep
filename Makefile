@@ -1,4 +1,4 @@
-.PHONY: gen build run stop clean logs report signing test dmg
+.PHONY: gen build build-release run stop clean logs report signing test dmg
 
 APP := build/Build/Products/Debug/BarKeep.app
 KEYCHAIN := $(HOME)/Library/Keychains/barkeep-dev.keychain-db
@@ -31,7 +31,18 @@ test: gen
 		CODE_SIGNING_REQUIRED=NO \
 		test
 
-dmg: build
+build-release: gen signing
+	xcodebuild \
+		-project BarKeep.xcodeproj \
+		-scheme BarKeep \
+		-configuration Release \
+		-derivedDataPath build \
+		CODE_SIGN_STYLE=Manual \
+		CODE_SIGN_IDENTITY="$(SIGN_IDENTITY)" \
+		OTHER_CODE_SIGN_FLAGS="--keychain $(KEYCHAIN)" \
+		build
+
+dmg: build-release
 	@bash scripts/build-dmg.sh
 
 run: build

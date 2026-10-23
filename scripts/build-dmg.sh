@@ -3,7 +3,11 @@ set -euo pipefail
 
 # Создаёт готовый .dmg дистрибутив для BarKeep.
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_PATH="$ROOT_DIR/build/Build/Products/Debug/BarKeep.app"
+if [[ -d "$ROOT_DIR/build/Build/Products/Release/BarKeep.app" ]]; then
+    APP_PATH="$ROOT_DIR/build/Build/Products/Release/BarKeep.app"
+else
+    APP_PATH="$ROOT_DIR/build/Build/Products/Debug/BarKeep.app"
+fi
 DIST_DIR="$ROOT_DIR/dist"
 DMG_PATH="$DIST_DIR/BarKeep.dmg"
 STAGE_DIR="$(mktemp -d /tmp/barkeep-dmg-XXXXXX)"
