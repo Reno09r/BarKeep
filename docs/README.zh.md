@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> •
+  <a href="../README.md">English</a> •
   <a href="README.ru.md">Русский</a> •
   <a href="README.kk.md">Қазақша</a> •
   <a href="README.zh.md"><strong>简体中文</strong></a>
@@ -214,4 +214,4 @@ BarKeep/
 
 ## 开源许可证
 
-本项目基于 [MIT 许可证](LICENSE) 开源发布。
+本项目基于 [MIT 许可证](../LICENSE) 开源发布。

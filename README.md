@@ -6,9 +6,9 @@
 
 <p align="center">
   <a href="README.md"><strong>English</strong></a> •
-  <a href="README.ru.md">Русский</a> •
-  <a href="README.kk.md">Қазақша</a> •
-  <a href="README.zh.md">简体中文</a>
+  <a href="docs/README.ru.md">Русский</a> •
+  <a href="docs/README.kk.md">Қазақша</a> •
+  <a href="docs/README.zh.md">简体中文</a>
 </p>
 
 <p align="center">
