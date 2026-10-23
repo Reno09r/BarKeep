@@ -13,18 +13,20 @@ enum AppTerminator {
         guard let direct = NSRunningApplication(processIdentifier: item.ownerPID) else { return nil }
         guard let directURL = direct.bundleURL else { return direct }
 
-        var bundleURL = directURL
-        while bundleURL.pathExtension != "app" {
-            let parent = bundleURL.deletingLastPathComponent()
-            if parent.path == "/" || parent.path == bundleURL.path { break }
-            bundleURL = parent
+        // Ищем внешний родительский .app бандл, если текущий процесс — вложенный хелпер
+        var searchURL = directURL.deletingLastPathComponent()
+        while searchURL.path != "/" && searchURL.path != "." {
+            if searchURL.pathExtension == "app" {
+                if let identifier = Bundle(url: searchURL)?.bundleIdentifier,
+                   let main = NSRunningApplication.runningApplications(withBundleIdentifier: identifier).first {
+                    return main
+                }
+                break
+            }
+            searchURL = searchURL.deletingLastPathComponent()
         }
 
-        guard bundleURL.path != directURL.path else { return direct }
-        guard let identifier = Bundle(url: bundleURL)?.bundleIdentifier,
-              let main = NSRunningApplication.runningApplications(withBundleIdentifier: identifier).first
-        else { return direct }
-        return main
+        return direct
     }
 
     static func displayName(for item: MenuBarItem) -> String {
@@ -40,7 +42,7 @@ enum AppTerminator {
 
     @discardableResult
     static func terminate(item: MenuBarItem, force: Bool) -> Bool {
-        guard let app = target(for: item) else { return false }
+        guard canManage(item: item), let app = target(for: item) else { return false }
         return force ? app.forceTerminate() : app.terminate()
     }
 

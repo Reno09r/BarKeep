@@ -1,0 +1,72 @@
+import XCTest
+@testable import BarKeep
+
+@MainActor
+final class BarKeepTests: XCTestCase {
+    func testTransliteration() {
+        XCTAssertEqual(BarPanelView.transliterate("телеграм"), "telegram")
+        XCTAssertEqual(BarPanelView.transliterate("хром"), "hrom")
+        XCTAssertEqual(BarPanelView.transliterate("яндекс"), "yandeks")
+        XCTAssertEqual(BarPanelView.transliterate("қазақша"), "kazaksha")
+    }
+
+    func testNormalization() {
+        XCTAssertEqual(BarPanelView.normalized("TELEGRAM"), "telegram")
+        XCTAssertEqual(BarPanelView.normalized("Café"), "cafe")
+    }
+
+    func testMenuBarItemDisplay() {
+        let normalItem = MenuBarItem(
+            windowID: 101,
+            ownerPID: 1000,
+            ownerName: "Slack",
+            bundleIdentifier: "com.tinyspeck.slackmacgap",
+            title: nil,
+            frame: CGRect(x: 500, y: 0, width: 24, height: 24),
+            isOnScreen: true,
+            axElement: nil
+        )
+        XCTAssertEqual(normalItem.displayName, "Slack")
+        XCTAssertFalse(normalItem.isOffscreen)
+
+        let offscreenItem = MenuBarItem(
+            windowID: 102,
+            ownerPID: 1001,
+            ownerName: "Discord",
+            bundleIdentifier: "com.hnc.Discord",
+            title: nil,
+            frame: CGRect(x: -500, y: 0, width: 24, height: 24),
+            isOnScreen: false,
+            axElement: nil
+        )
+        XCTAssertTrue(offscreenItem.isOffscreen)
+    }
+
+    func testControlCenterItemDisplayNames() {
+        let wifi = MenuBarItem(
+            windowID: 201,
+            ownerPID: 500,
+            ownerName: "ControlCenter",
+            bundleIdentifier: "com.apple.controlcenter",
+            title: "WiFi",
+            frame: CGRect(x: 800, y: 0, width: 24, height: 24),
+            isOnScreen: true,
+            axElement: nil
+        )
+        XCTAssertEqual(wifi.displayName, "Wi-Fi")
+    }
+
+    func testCanManageProtectsAppleProcesses() {
+        let appleItem = MenuBarItem(
+            windowID: 301,
+            ownerPID: 1,
+            ownerName: "ControlCenter",
+            bundleIdentifier: "com.apple.controlcenter",
+            title: nil,
+            frame: CGRect(x: 900, y: 0, width: 24, height: 24),
+            isOnScreen: true,
+            axElement: nil
+        )
+        XCTAssertFalse(AppTerminator.canManage(item: appleItem))
+    }
+}

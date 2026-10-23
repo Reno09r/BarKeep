@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var panelController: BarPanelController?
     private var activationService: ItemActivationService?
     private var hoverController: HoverRevealController?
+    private var permissionPollTimer: Timer?
 
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -37,7 +38,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if permissions.accessibility {
             layout.applyDefaultState()
-            hover.start()
+            if hover.isEnabled {
+                hover.start()
+            }
         } else {
             Log.warning("Accessibility не выдано — секции не скрываются, чтобы не оставить меню-бар пустым")
         }
@@ -48,8 +51,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if !permissions.accessibility {
             Log.warning("Нет доступа к Accessibility — активация иконок будет ограничена.")
+            startPermissionPollingIfNeeded()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.showAccessibilityOnboarding()
+            }
+        }
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        checkPermissionRecovery()
+    }
+
+    private func startPermissionPollingIfNeeded() {
+        guard !permissions.accessibility else { return }
+        permissionPollTimer?.invalidate()
+        permissionPollTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.checkPermissionRecovery()
+            }
+        }
+    }
+
+    private func checkPermissionRecovery() {
+        guard !permissions.accessibility else { return }
+        permissions.refresh(force: true)
+        if permissions.accessibility {
+            permissionPollTimer?.invalidate()
+            permissionPollTimer = nil
+            Log.info("Доступ к Accessibility обнаружен — активируем скрытие иконок")
+            layout?.applyDefaultState()
+            if hoverController?.isEnabled == true {
+                hoverController?.start()
             }
         }
     }
@@ -101,8 +133,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let modifiers = UInt32(controlKey | optionKey | cmdKey)
 
         HotkeyCenter.shared.register(keyCode: UInt32(kVK_ANSI_H), modifiers: modifiers) { [weak self] in
-            Log.info("Хоткей ⌃⌥⌘H")
-            self?.layout?.toggle(.hidden)
+            Log.info("Хоткей ⌃⌥⌘H: открыть/закрыть панель")
+            self?.panelController?.toggle()
         }
         HotkeyCenter.shared.register(keyCode: UInt32(kVK_ANSI_A), modifiers: modifiers) { [weak self] in
             Log.info("Хоткей ⌃⌥⌘A")

@@ -96,6 +96,7 @@ final class MenuBarLayoutController {
             return
         case .hidden:
             isHiddenSectionCollapsed = false
+            isAlwaysHiddenSectionCollapsed = false
             hiddenDivider.length = Self.expandedLength
         case .alwaysHidden:
             isAlwaysHiddenSectionCollapsed = false
@@ -141,10 +142,12 @@ final class MenuBarLayoutController {
     }
 
     func section(forX x: CGFloat) -> Section {
-        guard let hiddenMinX = hiddenFrame?.minX else { return .visible }
-        if x > hiddenMinX { return .visible }
-        guard isAlwaysHiddenEnabled, let alwaysHiddenMinX = alwaysHiddenFrame?.minX else { return .hidden }
-        return x < alwaysHiddenMinX ? .alwaysHidden : .hidden
+        guard let hiddenFrame = hiddenFrame else { return .visible }
+        let visibleBoundary = hiddenDivider.length > Self.collapsedLength ? hiddenFrame.maxX : hiddenFrame.minX
+        if x >= visibleBoundary { return .visible }
+        guard isAlwaysHiddenEnabled, let alwaysHiddenFrame = alwaysHiddenFrame else { return .hidden }
+        let alwaysBoundary = alwaysHiddenDivider.length > Self.collapsedLength ? alwaysHiddenFrame.maxX : alwaysHiddenFrame.minX
+        return x < alwaysBoundary ? .alwaysHidden : .hidden
     }
 
     private func logFrames(_ context: String) {
@@ -162,9 +165,14 @@ final class MenuBarLayoutController {
 
     // MARK: - Настройка
 
+    func configureHiddenDividerAction(target: AnyObject, action: Selector) {
+        hiddenDivider.button?.target = target
+        hiddenDivider.button?.action = action
+    }
+
     private static func configureDivider(_ item: NSStatusItem) {
         item.button?.image = dividerImage()
-        item.button?.toolTip = "Граница секции BarKeep — перетащите иконки через неё с ⌘"
+        item.button?.toolTip = "BarKeep: клик — открыть панель иконок; ⌘ + перетаскивание — скрыть иконку"
     }
 
     /// Невидимый разделитель для пока не используемой секции.

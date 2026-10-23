@@ -21,7 +21,7 @@ final class HoverRevealController {
     }
 
     var isEnabled: Bool {
-        UserDefaults.standard.object(forKey: "BarKeepHoverReveal") as? Bool ?? true
+        UserDefaults.standard.object(forKey: "BarKeepHoverReveal") as? Bool ?? false
     }
 
     func start() {
@@ -43,10 +43,11 @@ final class HoverRevealController {
 
     private func tick() {
         guard isEnabled, !isSuspended else { return }
-        guard let screen = NSScreen.main else { return }
-
         let mouse = NSEvent.mouseLocation
-        let barBottom = screen.frame.maxY - ItemActivator.menuBarHeight
+        guard let screen = NSScreen.screens.first(where: { NSPointInRect(mouse, $0.frame) }) else { return }
+
+        let menuBarHeight = max(24, screen.frame.maxY - screen.visibleFrame.maxY)
+        let barBottom = screen.frame.maxY - menuBarHeight
         let isInBar = mouse.y >= barBottom - 1
 
         guard isInBar else {
@@ -66,8 +67,9 @@ final class HoverRevealController {
         // Секция уже показана — ничего не делаем, пока курсор в меню-баре.
         guard !layout.isHiddenSectionCollapsed else { return }
 
-        let rightEdge = layout.hiddenFrame?.maxX ?? 0
-        guard mouse.x > zoneMinX, mouse.x < rightEdge - 10 else { return }
+        let screenZoneMinX = screen.frame.minX + zoneMinX
+        let rightEdge = layout.hiddenFrame?.maxX ?? screen.frame.maxX
+        guard mouse.x > screenZoneMinX, mouse.x < rightEdge - 10 else { return }
 
         layout.show(.hidden)
         revealedByHover = true

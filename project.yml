@@ -41,6 +41,14 @@ targets:
       - sdk: ScreenCaptureKit.framework
       - sdk: ServiceManagement.framework
 
+  BarKeepTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: BarKeep
+
 schemes:
   BarKeep:
     build:
@@ -48,5 +56,9 @@ schemes:
         BarKeep: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - BarKeepTests
     archive:
       config: Release

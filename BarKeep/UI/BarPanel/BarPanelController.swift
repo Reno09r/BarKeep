@@ -6,6 +6,7 @@ import SwiftUI
 final class BarPanelController {
     private var panel: BarPanelWindow?
     private var clickMonitor: Any?
+    private var clickMonitorWorkItem: DispatchWorkItem?
     private var keyMonitor: Any?
     private var previousApp: NSRunningApplication?
     private let layout: MenuBarLayoutController
@@ -129,8 +130,12 @@ final class BarPanelController {
 
         // Клик вне панели закрывает её (но не тот клик, которым её открыли).
         openedAt = Date()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        let workItem = DispatchWorkItem { [weak self] in
             guard let self, self.panel != nil else { return }
+            if let existing = self.clickMonitor {
+                NSEvent.removeMonitor(existing)
+                self.clickMonitor = nil
+            }
             self.clickMonitor = NSEvent.addGlobalMonitorForEvents(
                 matching: [.leftMouseDown, .rightMouseDown]
             ) { [weak self] _ in
@@ -141,11 +146,15 @@ final class BarPanelController {
                 }
             }
         }
+        clickMonitorWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
 
         Log.info("Панель открыта: \(items.count) иконок, размер \(Int(size.width))x\(Int(size.height))")
     }
 
     func close(restoreFocus: Bool = true) {
+        clickMonitorWorkItem?.cancel()
+        clickMonitorWorkItem = nil
         if let clickMonitor {
             NSEvent.removeMonitor(clickMonitor)
             self.clickMonitor = nil
@@ -217,8 +226,13 @@ final class BarPanelController {
 
     // MARK: - Геометрия
 
+    private func currentScreen() -> NSScreen {
+        let mouse = NSEvent.mouseLocation
+        return NSScreen.screens.first(where: { NSPointInRect(mouse, $0.frame) }) ?? NSScreen.main ?? NSScreen.screens[0]
+    }
+
     private func panelSize() -> NSSize {
-        let screen = NSScreen.main ?? NSScreen.screens[0]
+        let screen = currentScreen()
         let available = screen.frame.width - 80
         let iconsWidth = CGFloat(min(items.count, 14)) * 38 + 24
         let width = min(available, max(340, iconsWidth + 190))
@@ -226,9 +240,10 @@ final class BarPanelController {
     }
 
     private func origin(for size: NSSize) -> NSPoint {
-        let screen = NSScreen.main ?? NSScreen.screens[0]
+        let screen = currentScreen()
         let x = screen.frame.maxX - size.width - 12
-        let y = screen.frame.maxY - ItemActivator.menuBarHeight - size.height - 8
+        let menuBarHeight = max(24, screen.frame.maxY - screen.visibleFrame.maxY)
+        let y = screen.frame.maxY - menuBarHeight - size.height - 8
         return NSPoint(x: x, y: y)
     }
 }

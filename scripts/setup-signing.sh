@@ -9,7 +9,7 @@ KEYCHAIN_PASS="barkeep"
 WORK_DIR="${TMPDIR:-/tmp}/barkeep-signing"
 
 if security find-certificate -c "$CERT_NAME" "$KEYCHAIN" >/dev/null 2>&1; then
-    echo "Сертификат «$CERT_NAME» уже есть в $KEYCHAIN"
+    echo "Сертификат «${CERT_NAME}» уже есть в $KEYCHAIN"
     security unlock-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN" >/dev/null
     exit 0
 fi

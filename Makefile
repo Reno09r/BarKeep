@@ -1,4 +1,4 @@
-.PHONY: gen build run stop clean logs report signing
+.PHONY: gen build run stop clean logs report signing test
 
 APP := build/Build/Products/Debug/BarKeep.app
 KEYCHAIN := $(HOME)/Library/Keychains/barkeep-dev.keychain-db
@@ -21,6 +21,15 @@ build: gen signing
 		CODE_SIGN_IDENTITY="$(SIGN_IDENTITY)" \
 		OTHER_CODE_SIGN_FLAGS="--keychain $(KEYCHAIN)" \
 		build
+
+test: gen
+	xcodebuild \
+		-project BarKeep.xcodeproj \
+		-scheme BarKeep \
+		-configuration Debug \
+		CODE_SIGN_IDENTITY="" \
+		CODE_SIGNING_REQUIRED=NO \
+		test
 
 run: build
 	@pkill -x BarKeep 2>/dev/null || true

@@ -54,6 +54,7 @@ enum AX {
 
     static func extrasMenuBar(for pid: pid_t) -> AXUIElement? {
         let app = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(app, 0.15)
         return element(app, kAXExtrasMenuBarAttribute)
     }
 

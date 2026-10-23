@@ -8,7 +8,7 @@ final class ItemActivationService {
     private var rehideWorkItem: DispatchWorkItem?
 
     /// Через сколько секунд возвращать иконки обратно после временного показа.
-    var autoHideDelay: TimeInterval = 5
+    var autoHideDelay: TimeInterval = 2.5
 
     init(layout: MenuBarLayoutController, scanner: MenuBarItemScanner) {
         self.layout = layout
@@ -19,6 +19,12 @@ final class ItemActivationService {
         let section = layout.section(forX: item.frame.minX)
 
         guard section != .visible else {
+            ItemActivator.activate(item, button: button)
+            return
+        }
+
+        // Если скрытая секция уже развернута пользователем, активируем без автоскрытия
+        if section == .hidden, layout.isHiddenSectionCollapsed {
             ItemActivator.activate(item, button: button)
             return
         }
@@ -72,6 +78,15 @@ final class ItemActivationService {
         rehideWorkItem?.cancel()
         let workItem = DispatchWorkItem { [weak self] in
             guard let self else { return }
+            // Не скрываем секцию, пока пользователь держит курсор в меню-баре
+            let mouse = NSEvent.mouseLocation
+            if let screen = NSScreen.screens.first(where: { NSPointInRect(mouse, $0.frame) }) {
+                let menuBarHeight = max(24, screen.frame.maxY - screen.visibleFrame.maxY)
+                if mouse.y >= screen.frame.maxY - menuBarHeight - 1 {
+                    self.scheduleAutoHide(section, extraDelay: 2.0)
+                    return
+                }
+            }
             self.layout.hide(section)
             Log.info("Автоскрытие секции \(section.title)")
         }

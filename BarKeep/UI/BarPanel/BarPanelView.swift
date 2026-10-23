@@ -64,14 +64,26 @@ struct BarPanelView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Ширина ряда: 34 pt иконка + 3 pt отступ + 16 pt поля.
+    private func itemWidth(for item: MenuBarItem) -> CGFloat {
+        let h = max(1, item.frame.height)
+        let w = item.frame.width
+        if w > h * 1.2 {
+            return max(34, min(140, 24 * (w / h) + 10))
+        }
+        return 34
+    }
+
+    /// Динамическая ширина ряда с учётом пропорций элементов.
     private var rowWidth: CGFloat {
-        filteredItems.isEmpty ? 150 : CGFloat(filteredItems.count) * 37 + 13
+        if filteredItems.isEmpty { return 150 }
+        let totalItemsWidth = filteredItems.reduce(0) { $0 + itemWidth(for: $1) }
+        return totalItemsWidth + CGFloat(filteredItems.count - 1) * 3 + 16
     }
 
     private func iconButton(for item: MenuBarItem) -> some View {
         let canManage = AppTerminator.canManage(item: item)
         let appName = AppTerminator.displayName(for: item)
+        let width = itemWidth(for: item)
 
         return Button {
             onActivate(item)
@@ -92,7 +104,7 @@ struct BarPanelView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .frame(width: 34, height: 34)
+            .frame(width: width, height: 34)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -175,7 +187,7 @@ struct BarPanelView: View {
         }
     }
 
-    private static func searchText(for item: MenuBarItem) -> String {
+    static func searchText(for item: MenuBarItem) -> String {
         [
             item.displayName,
             item.ownerName,
@@ -186,12 +198,12 @@ struct BarPanelView: View {
         .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 
-    private static func normalized(_ value: String) -> String {
+    static func normalized(_ value: String) -> String {
         value.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 
     /// Простая транслитерация, чтобы «телеграм» находил Telegram, а «telegram» — Телеграм.
-    private static func transliterate(_ value: String) -> String {
+    static func transliterate(_ value: String) -> String {
         var result = ""
         result.reserveCapacity(value.count)
         for character in value {

@@ -37,6 +37,8 @@ final class StatusItemController: NSObject, NSMenuDelegate {
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
+        layout.configureHiddenDividerAction(target: self, action: #selector(dividerClicked))
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(appLanguageDidChange),
@@ -49,6 +51,10 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     @objc private func appLanguageDidChange() {
         rebuild(menu)
+    }
+
+    @objc private func dividerClicked() {
+        panel.toggle()
     }
 
     @objc private func statusItemClicked() {

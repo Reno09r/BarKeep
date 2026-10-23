@@ -106,7 +106,7 @@ final class WheelScrollView: NSScrollView {
             delta = dx
         } else {
             // Вертикальное колесо/свайп двигает ряд по горизонтали.
-            delta = -dy
+            delta = dy
         }
         if !event.hasPreciseScrollingDeltas {
             delta *= 10

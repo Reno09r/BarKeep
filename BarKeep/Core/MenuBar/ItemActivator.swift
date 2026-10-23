@@ -27,8 +27,9 @@ enum ItemActivator {
             return false
         }
 
-        click(at: CGPoint(x: item.frame.midX, y: menuBarHeight / 2), button: button)
-        Log.info("Координатный клик: \(item.displayName) @ x=\(Int(item.frame.midX))")
+        let clickY = item.frame.midY > 0 ? item.frame.midY : (menuBarHeight / 2)
+        click(at: CGPoint(x: item.frame.midX, y: clickY), button: button)
+        Log.info("Координатный клик: \(item.displayName) @ (\(Int(item.frame.midX)), \(Int(clickY)))")
         return true
     }
 
@@ -44,26 +45,28 @@ enum ItemActivator {
         let downType: CGEventType = button == .left ? .leftMouseDown : .rightMouseDown
         let upType: CGEventType = button == .left ? .leftMouseUp : .rightMouseUp
 
-        func post(_ type: CGEventType, _ location: CGPoint) {
-            guard let event = CGEvent(
-                mouseEventSource: nil,
-                mouseType: type,
-                mouseCursorPosition: location,
-                mouseButton: mouseButton
-            ) else { return }
-            event.setIntegerValueField(.mouseEventClickState, value: 1)
-            event.post(tap: .cghidEventTap)
-        }
+        DispatchQueue.global(qos: .userInteractive).async {
+            func post(_ type: CGEventType, _ location: CGPoint) {
+                guard let event = CGEvent(
+                    mouseEventSource: nil,
+                    mouseType: type,
+                    mouseCursorPosition: location,
+                    mouseButton: mouseButton
+                ) else { return }
+                event.setIntegerValueField(.mouseEventClickState, value: 1)
+                event.post(tap: .cghidEventTap)
+            }
 
-        // При автоскрытии меню-бара сначала «выводим» его курсором к верхней кромке.
-        post(.mouseMoved, CGPoint(x: point.x, y: 1))
-        usleep(350_000)
-        post(.mouseMoved, point)
-        usleep(120_000)
-        post(downType, point)
-        usleep(90_000)
-        post(upType, point)
-        usleep(200_000)
-        post(.mouseMoved, saved)
+            // При автоскрытии меню-бара сначала «выводим» его курсором к верхней кромке.
+            post(.mouseMoved, CGPoint(x: point.x, y: max(1, point.y - 10)))
+            usleep(350_000)
+            post(.mouseMoved, point)
+            usleep(120_000)
+            post(downType, point)
+            usleep(90_000)
+            post(upType, point)
+            usleep(200_000)
+            post(.mouseMoved, saved)
+        }
     }
 }
