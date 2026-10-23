@@ -27,9 +27,9 @@ enum AppEnvironment {
             .joined(separator: "; ")
         return """
         macOS \(version.majorVersion).\(version.minorVersion).\(version.patchVersion)
-        Экраны: \(screens)
-        Высота меню-бара: \(ItemActivator.menuBarHeight)
-        Конфликтующий менеджер: \(conflictingManagerName ?? "нет")
+        Screens: \(screens)
+        Menu bar height: \(ItemActivator.menuBarHeight) pt
+        Conflicting manager: \(conflictingManagerName ?? "none")
         """
     }
 }

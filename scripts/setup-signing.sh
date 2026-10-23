@@ -11,6 +11,12 @@ WORK_DIR="${TMPDIR:-/tmp}/barkeep-signing"
 if security find-certificate -c "$CERT_NAME" "$KEYCHAIN" >/dev/null 2>&1; then
     echo "Сертификат «${CERT_NAME}» уже есть в $KEYCHAIN"
     security unlock-keychain -p "$KEYCHAIN_PASS" "$KEYCHAIN" >/dev/null
+    # Убеждаемся, что публичный сертификат есть в login.keychain-db для распознавания TCC / Accessibility
+    if ! security find-certificate -c "$CERT_NAME" "$HOME/Library/Keychains/login.keychain-db" >/dev/null 2>&1; then
+        security find-certificate -c "$CERT_NAME" -p "$KEYCHAIN" > /tmp/barkeep-dev-public.cer
+        security add-certificates -k "$HOME/Library/Keychains/login.keychain-db" /tmp/barkeep-dev-public.cer 2>/dev/null || true
+        rm -f /tmp/barkeep-dev-public.cer
+    fi
     exit 0
 fi
 
@@ -36,6 +42,9 @@ security import barkeep.p12 -k "$KEYCHAIN" -P "$KEYCHAIN_PASS" \
     -T /usr/bin/codesign -T /usr/bin/security >/dev/null
 security set-key-partition-list -S apple-tool:,apple:,codesign: \
     -s -k "$KEYCHAIN_PASS" "$KEYCHAIN" >/dev/null
+
+# Добавляем публичный сертификат в login.keychain-db для доверия TCC (Accessibility)
+security add-certificates -k "$HOME/Library/Keychains/login.keychain-db" barkeep.crt 2>/dev/null || true
 
 # Добавляем keychain в список поиска, сохраняя существующие.
 EXISTING=$(security list-keychains -d user | tr -d '"')

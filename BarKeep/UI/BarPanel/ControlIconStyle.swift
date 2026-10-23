@@ -9,13 +9,24 @@ public enum ControlIconStyle: String, CaseIterable, Identifiable {
 
     public var id: String { rawValue }
 
+    @MainActor
+    public var localizedTitle: String {
+        switch self {
+        case .rectangle: return Localization.tr(.styleRectangle)
+        case .dots: return Localization.tr(.styleDots)
+        case .chevron: return Localization.tr(.styleChevron)
+        case .bar: return Localization.tr(.styleBar)
+        case .dash: return Localization.tr(.styleDash)
+        }
+    }
+
     public var title: String {
         switch self {
-        case .rectangle: return "Прямоугольник (по умолчанию)"
-        case .dots: return "Точки (···)"
-        case .chevron: return "Шеврон (⟨)"
-        case .bar: return "Разделитель (|)"
-        case .dash: return "Черта (—)"
+        case .rectangle: return "Rectangle (default)"
+        case .dots: return "Dots (···)"
+        case .chevron: return "Chevron (⟨)"
+        case .bar: return "Bar (|)"
+        case .dash: return "Dash (—)"
         }
     }
 

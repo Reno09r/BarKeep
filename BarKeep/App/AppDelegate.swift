@@ -117,6 +117,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             case "toggleAlwaysHidden": layout.toggle(.alwaysHidden)
             case "reset": layout.resetAll()
             case "panel": self.panelController?.toggle()
+            case "settings":
+                if let layout = self.layout, let hover = self.hoverController {
+                    SettingsWindowController.show(permissions: self.permissions, layout: layout, hover: hover)
+                }
             case let action where action.hasPrefix("activate:"):
                 let name = String(action.dropFirst("activate:".count))
                 let scanner = MenuBarItemScanner()

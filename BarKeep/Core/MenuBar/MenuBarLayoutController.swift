@@ -216,7 +216,7 @@ final class MenuBarLayoutController {
 
     private static func configureDivider(_ item: NSStatusItem) {
         item.button?.image = dividerImage()
-        item.button?.toolTip = "BarKeep: клик — открыть панель иконок; ⌘ + перетаскивание — скрыть иконку"
+        item.button?.toolTip = Localization.tr(.statusItemTooltip)
     }
 
     /// Невидимый разделитель для пока не используемой секции.

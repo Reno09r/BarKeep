@@ -105,6 +105,50 @@ public final class Localization: ObservableObject {
         case reportDividers = "report_dividers"
         case reportStateShown = "report_state_shown"
         case reportStateHidden = "report_state_hidden"
+
+        case hotkeysTab = "hotkeys_tab"
+        case launchAtLoginDesc = "launch_at_login_desc"
+        case showOnHoverDesc = "show_on_hover_desc"
+        case alwaysHiddenDesc = "always_hidden_desc"
+        case languageDesc = "language_desc"
+        case iconPreview = "icon_preview"
+        case openHiddenPanel = "open_hidden_panel"
+        case openHiddenPanelDesc = "open_hidden_panel_desc"
+        case resetIconsDesc = "reset_icons_desc"
+        case hotkeyPanelDesc = "hotkey_panel_desc"
+        case hotkeyAlwaysHiddenDesc = "hotkey_always_hidden_desc"
+        case hotkeyResetDesc = "hotkey_reset_desc"
+        case hotkeyTip = "hotkey_tip"
+        case accessibilityDesc = "accessibility_desc"
+        case screenRecordingDesc = "screen_recording_desc"
+        case statusGranted = "status_granted"
+        case statusRequired = "status_required"
+        case statusOptional = "status_optional"
+        case checkPermissions = "check_permissions"
+        case systemInfo = "system_info"
+        case diagnosticsAndLogs = "diagnostics_and_logs"
+
+        case generalSubheader = "general_subheader"
+        case iconSubheader = "icon_subheader"
+        case permissionsSubheader = "permissions_subheader"
+        case menuBarHeight = "menubar_height"
+        case conflictingApps = "conflicting_apps"
+        case noConflictsDetected = "no_conflicts_detected"
+        case copyReportDesc = "copy_report_desc"
+        case copied = "copied"
+        case copy = "copy"
+        case openLogDesc = "open_log_desc"
+        case open = "open"
+
+        case styleRectangle = "style_rectangle"
+        case styleDots = "style_dots"
+        case styleChevron = "style_chevron"
+        case styleBar = "style_bar"
+        case styleDash = "style_dash"
+
+        case statusItemTooltip = "status_item_tooltip"
+        case resetAccessibility = "reset_accessibility"
+        case resetAccessibilityDesc = "reset_accessibility_desc"
     }
 
     private static let strings: [AppLanguage: [Key: String]] = [
@@ -165,7 +209,51 @@ public final class Localization: ObservableObject {
             .reportAlwaysHidden: "Always hidden: %@",
             .reportDividers: "Dividers: hidden.minX=%d alwaysHidden.minX=%d",
             .reportStateShown: "shown",
-            .reportStateHidden: "hidden"
+            .reportStateHidden: "hidden",
+
+            .hotkeysTab: "Shortcuts",
+            .launchAtLoginDesc: "Launch BarKeep automatically when logging in to your Mac",
+            .showOnHoverDesc: "Reveal hidden menu bar icons when cursor hovers near the bar",
+            .alwaysHiddenDesc: "Adds a secondary divider for icons you want to keep permanently hidden",
+            .languageDesc: "Choose interface language for BarKeep",
+            .iconPreview: "Menu Bar Preview",
+            .openHiddenPanel: "Open Hidden Panel",
+            .openHiddenPanelDesc: "Display floating panel containing all hidden icons",
+            .resetIconsDesc: "Reset dividers and return all icons to default visible positions",
+            .hotkeyPanelDesc: "Toggle hidden icons floating panel",
+            .hotkeyAlwaysHiddenDesc: "Toggle always-hidden icons section",
+            .hotkeyResetDesc: "Emergency restore of all menu bar icons",
+            .hotkeyTip: "Global shortcuts work from any application in macOS.",
+            .accessibilityDesc: "Required to inspect, arrange, and hide items in the macOS menu bar",
+            .screenRecordingDesc: "Used to capture crisp thumbnails of icons for the hidden panel",
+            .statusGranted: "Active",
+            .statusRequired: "Action Required",
+            .statusOptional: "Optional",
+            .checkPermissions: "Check Permissions",
+            .systemInfo: "System Information",
+            .diagnosticsAndLogs: "Diagnostics & Logs",
+
+            .generalSubheader: "Manage startup behavior, hover reveal, and language",
+            .iconSubheader: "Menu bar icon style and quick actions",
+            .permissionsSubheader: "macOS system permissions required for menu bar management",
+            .menuBarHeight: "Menu bar height",
+            .conflictingApps: "Conflicting utilities",
+            .noConflictsDetected: "None detected",
+            .copyReportDesc: "Copy system info, screen layout, and divider positions",
+            .copied: "Copied!",
+            .copy: "Copy",
+            .openLogDesc: "Show BarKeep application log in Finder",
+            .open: "Open",
+
+            .styleRectangle: "Rectangle (default)",
+            .styleDots: "Dots (···)",
+            .styleChevron: "Chevron (⟨)",
+            .styleBar: "Bar (|)",
+            .styleDash: "Dash (—)",
+
+            .statusItemTooltip: "BarKeep: Click to open icons panel; ⌘ + Drag to rearrange",
+            .resetAccessibility: "Reset Permission",
+            .resetAccessibilityDesc: "If BarKeep is already checked in System Settings, toggle it off and on or click here to reset"
         ],
         .ru: [
             .appVersion: "BarKeep %@",
@@ -224,7 +312,51 @@ public final class Localization: ObservableObject {
             .reportAlwaysHidden: "Всегда-скрытые: %@",
             .reportDividers: "Разделители: hidden.minX=%d alwaysHidden.minX=%d",
             .reportStateShown: "показаны",
-            .reportStateHidden: "спрятаны"
+            .reportStateHidden: "спрятаны",
+
+            .hotkeysTab: "Горячие клавиши",
+            .launchAtLoginDesc: "Автоматически запускать BarKeep при входе в систему",
+            .showOnHoverDesc: "Раскрывать скрытые иконки при наведении курсора на меню-бар",
+            .alwaysHiddenDesc: "Добавляет второй разделитель для иконок, которые всегда должны быть скрыты",
+            .languageDesc: "Выберите язык интерфейса BarKeep",
+            .iconPreview: "Предпросмотр в строке меню",
+            .openHiddenPanel: "Открыть панель",
+            .openHiddenPanelDesc: "Открыть плавающее окно со всеми скрытыми иконками",
+            .resetIconsDesc: "Сбросить разделители и вернуть все иконки на исходные позиции",
+            .hotkeyPanelDesc: "Открыть или закрыть панель скрытых иконок",
+            .hotkeyAlwaysHiddenDesc: "Показать или спрятать секцию «Всегда скрытые»",
+            .hotkeyResetDesc: "Аварийный возврат всех иконок меню-бара",
+            .hotkeyTip: "Глобальные сочетания клавиш работают из любого приложения в macOS.",
+            .accessibilityDesc: "Необходимо для считывания положения и скрытия иконок в меню-баре",
+            .screenRecordingDesc: "Используется для захвата качественных миниатюр иконок сторонних программ",
+            .statusGranted: "Активно",
+            .statusRequired: "Требуется действие",
+            .statusOptional: "Опционально",
+            .checkPermissions: "Проверить статус",
+            .systemInfo: "Информация о системе",
+            .diagnosticsAndLogs: "Диагностика и журналы",
+
+            .generalSubheader: "Управление автозапуском, поведением и языком",
+            .iconSubheader: "Стиль иконки BarKeep в меню-баре и быстрые действия",
+            .permissionsSubheader: "Системные доступы macOS для работы со строкой меню",
+            .menuBarHeight: "Высота меню-бара",
+            .conflictingApps: "Конфликтующие утилиты",
+            .noConflictsDetected: "Не обнаружены",
+            .copyReportDesc: "Скопировать системную информацию и состояние разделителей",
+            .copied: "Скопировано!",
+            .copy: "Скопировать",
+            .openLogDesc: "Открыть файл журнала в Finder",
+            .open: "Открыть",
+
+            .styleRectangle: "Прямоугольник (по умолчанию)",
+            .styleDots: "Точки (···)",
+            .styleChevron: "Шеврон (⟨)",
+            .styleBar: "Разделитель (|)",
+            .styleDash: "Черта (—)",
+
+            .statusItemTooltip: "BarKeep: клик — открыть панель иконок; ⌘ + перетаскивание — скрыть иконку",
+            .resetAccessibility: "Сбросить разрешение",
+            .resetAccessibilityDesc: "Если переключатель в Системных настройках уже включён, выключите и включите его снова или нажмите сброс"
         ],
         .kk: [
             .appVersion: "BarKeep %@",
@@ -283,7 +415,51 @@ public final class Localization: ObservableObject {
             .reportAlwaysHidden: "Әрқашан жасырын: %@",
             .reportDividers: "Бөлгіштер: hidden.minX=%d alwaysHidden.minX=%d",
             .reportStateShown: "көрсетілген",
-            .reportStateHidden: "жасырылған"
+            .reportStateHidden: "жасырылған",
+
+            .hotkeysTab: "Жылдам пернелер",
+            .launchAtLoginDesc: "Жүйеге кіргенде BarKeep-ті автоматты түрде қосу",
+            .showOnHoverDesc: "Меңзерді мәзір жолағына апарғанда жасырын белгішелерді көрсету",
+            .alwaysHiddenDesc: "Әрқашан жасырын тұратын белгішелер үшін қосымша бөлгіш қосады",
+            .languageDesc: "BarKeep интерфейс тілін таңдаңыз",
+            .iconPreview: "Мәзір жолағында алдын ала көру",
+            .openHiddenPanel: "Панельді ашу",
+            .openHiddenPanelDesc: "Барлық жасырын белгішелері бар қалқымалы тақтаны көрсету",
+            .resetIconsDesc: "Бөлгіштерді қалпына келтіріп, барлық белгішелерді бастапқы орнына қайтару",
+            .hotkeyPanelDesc: "Жасырын белгішелер тақтасын ашу немесе жабу",
+            .hotkeyAlwaysHiddenDesc: "«Әрқашан жасырын» бөлімін көрсету немесе тасалау",
+            .hotkeyResetDesc: "Барлық белгішелерді апаттық қалпына келтіру",
+            .hotkeyTip: "Жаһандық пернелер тіркесімі кез келген бағдарламада жұмыс істейді.",
+            .accessibilityDesc: "Мәзір жолағындағы белгішелерді басқару және жасыру үшін қажет",
+            .screenRecordingDesc: "Жасырын белгішелер тақтасы үшін анық нобайларды түсіруге пайдаланылады",
+            .statusGranted: "Қосулы",
+            .statusRequired: "Әрекет қажет",
+            .statusOptional: "Қосымша",
+            .checkPermissions: "Рұқсаттарды тексеру",
+            .systemInfo: "Жүйе туралы ақпарат",
+            .diagnosticsAndLogs: "Диагностика және журналдар",
+
+            .generalSubheader: "Автоматты түрде қосуды, әрекеттерді және тілді баптау",
+            .iconSubheader: "BarKeep белгішесінің стилі және жылдам әрекеттер",
+            .permissionsSubheader: "Мәзір жолағымен жұмыс істеуге қажетті macOS жүйелік рұқсаттары",
+            .menuBarHeight: "Мәзір жолағының биіктігі",
+            .conflictingApps: "Қайшылық тудыратын утилиталар",
+            .noConflictsDetected: "Табылмады",
+            .copyReportDesc: "Жүйелік ақпаратты және бөлгіштердің күйін көшіру",
+            .copied: "Көшірілді!",
+            .copy: "Көшіру",
+            .openLogDesc: "Журнал файлын Finder арқылы ашу",
+            .open: "Ашу",
+
+            .styleRectangle: "Тіктөртбұрыш (әдепкі)",
+            .styleDots: "Нүктелер (···)",
+            .styleChevron: "Шеврон (⟨)",
+            .styleBar: "Бөлгіш (|)",
+            .styleDash: "Сызықша (—)",
+
+            .statusItemTooltip: "BarKeep: белгішелер тақтасын ашу үшін басыңыз; жылжыту үшін ⌘ + сүйреңіз",
+            .resetAccessibility: "Рұқсатты қалпына келтіру",
+            .resetAccessibilityDesc: "Егер баптаулардағы қосқыш қосулы болса, оны өшіріп қайта қосыңыз немесе қалпына келтіруді басыңыз"
         ],
         .zh: [
             .appVersion: "BarKeep %@",
@@ -342,7 +518,51 @@ public final class Localization: ObservableObject {
             .reportAlwaysHidden: "始终隐藏：%@",
             .reportDividers: "分割线：hidden.minX=%d alwaysHidden.minX=%d",
             .reportStateShown: "已展开",
-            .reportStateHidden: "已收起"
+            .reportStateHidden: "已收起",
+
+            .hotkeysTab: "快捷键",
+            .launchAtLoginDesc: "登录 Mac 时自动启动 BarKeep",
+            .showOnHoverDesc: "光标悬停在菜单栏时自动展开隐藏图标",
+            .alwaysHiddenDesc: "为需要始终保持隐藏的图标添加次级分割线",
+            .languageDesc: "选择 BarKeep 的界面语言",
+            .iconPreview: "菜单栏实时预览",
+            .openHiddenPanel: "打开面板",
+            .openHiddenPanelDesc: "显示包含所有隐藏图标的浮动面板",
+            .resetIconsDesc: "重置分割线并将所有图标恢复到默认可见位置",
+            .hotkeyPanelDesc: "打开或关闭隐藏图标浮动面板",
+            .hotkeyAlwaysHiddenDesc: "显示或隐藏“始终隐藏”区域",
+            .hotkeyResetDesc: "紧急恢复所有菜单栏图标",
+            .hotkeyTip: "全局快捷键可在 macOS 中的任何应用程序下使用。",
+            .accessibilityDesc: "用于检测、读取菜单栏图标位置并管理其隐藏状态",
+            .screenRecordingDesc: "用于为隐藏面板截取清晰的应用图标缩略图",
+            .statusGranted: "已授权",
+            .statusRequired: "需要授权",
+            .statusOptional: "可选",
+            .checkPermissions: "检查权限状态",
+            .systemInfo: "系统信息",
+            .diagnosticsAndLogs: "诊断与日志",
+
+            .generalSubheader: "管理启动行为、悬停展开和界面语言",
+            .iconSubheader: "菜单栏图标样式与快捷操作",
+            .permissionsSubheader: "管理菜单栏所需的 macOS 系统权限",
+            .menuBarHeight: "菜单栏高度",
+            .conflictingApps: "冲突的应用程序",
+            .noConflictsDetected: "未检测到冲突",
+            .copyReportDesc: "复制系统信息、屏幕布局及分割线状态",
+            .copied: "已复制！",
+            .copy: "复制",
+            .openLogDesc: "在访达 (Finder) 中显示日志文件",
+            .open: "打开",
+
+            .styleRectangle: "矩形（默认）",
+            .styleDots: "圆点 (···)",
+            .styleChevron: "单书名号 (⟨)",
+            .styleBar: "竖线 (|)",
+            .styleDash: "破折号 (—)",
+
+            .statusItemTooltip: "BarKeep：点击打开图标面板；按住 ⌘ 并拖动可重新排列图标",
+            .resetAccessibility: "重置权限",
+            .resetAccessibilityDesc: "如果系统设置中的开关已开启，请尝试关闭后再重新打开，或点击重置"
         ]
     ]
 }

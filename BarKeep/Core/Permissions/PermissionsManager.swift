@@ -1,17 +1,19 @@
 import AppKit
 import ApplicationServices
 import ScreenCaptureKit
+import Combine
 
 /// Состояние системных разрешений и запрос доступа.
 @MainActor
-final class PermissionsManager {
-    private(set) var accessibility = false
-    private(set) var screenRecording = false
+final class PermissionsManager: ObservableObject {
+    @Published private(set) var accessibility = false
+    @Published private(set) var screenRecording = false
     private(set) var lastRefresh = Date.distantPast
 
     func refresh(force: Bool = false) {
-        if !force, Date().timeIntervalSince(lastRefresh) < 1 { return }
-        accessibility = AXIsProcessTrusted()
+        if !force, Date().timeIntervalSince(lastRefresh) < 0.5 { return }
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: false] as CFDictionary
+        accessibility = AXIsProcessTrustedWithOptions(options)
         screenRecording = CGPreflightScreenCaptureAccess()
         lastRefresh = Date()
     }
@@ -41,6 +43,17 @@ final class PermissionsManager {
 
     func openScreenRecordingSettings() {
         open("x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")
+    }
+
+    /// Сбрасывает устаревшую регистрацию TCC для пересобранного приложения.
+    func resetAccessibility() {
+        let task = Process()
+        task.launchPath = "/usr/bin/tccutil"
+        task.arguments = ["reset", "Accessibility", "com.reno.barkeep"]
+        try? task.run()
+        task.waitUntilExit()
+        refresh(force: true)
+        requestAccessibility()
     }
 
     private func open(_ string: String) {

@@ -220,7 +220,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         // Стиль иконки BarKeep
         let iconStyleMenu = NSMenu()
         for style in ControlIconStyle.allCases {
-            let styleItem = NSMenuItem(title: style.title, action: #selector(iconStyleSelected(_:)), keyEquivalent: "")
+            let styleItem = NSMenuItem(title: style.localizedTitle, action: #selector(iconStyleSelected(_:)), keyEquivalent: "")
             styleItem.target = self
             styleItem.representedObject = style
             styleItem.state = (layout.currentIconStyle == style) ? .on : .off

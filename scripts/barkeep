@@ -7,7 +7,7 @@ set -euo pipefail
 ACTION="${1:-panel}"
 
 case "$ACTION" in
-    panel|toggle|show|hide|reset|quit|help|--help|-h)
+    panel|toggle|show|hide|reset|settings|quit|help|--help|-h)
         ;;
     activate:*)
         ;;
@@ -20,6 +20,7 @@ case "$ACTION" in
         echo "  show          Show hidden icons in menu bar"
         echo "  hide          Hide icons in menu bar"
         echo "  reset         Emergency reset all dividers"
+        echo "  settings      Open BarKeep settings window"
         echo "  activate:<app> Activate specified app menu bar item"
         echo "  quit          Quit BarKeep application"
         exit 1
@@ -35,6 +36,7 @@ if [[ "$ACTION" == "help" || "$ACTION" == "--help" || "$ACTION" == "-h" ]]; then
     echo "  show          Show hidden icons"
     echo "  hide          Hide icons"
     echo "  reset         Emergency reset all dividers"
+    echo "  settings      Open BarKeep settings window"
     echo "  activate:<app> Activate specified app menu bar item"
     echo "  quit          Quit BarKeep"
     exit 0
