@@ -11,5 +11,7 @@ DerivedData/
 # macOS
 .DS_Store
 
-# Личные заметки
+# Личные заметки и планы
 notes/
+PLAN.md
+PLAN.MD
