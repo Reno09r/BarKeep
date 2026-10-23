@@ -182,13 +182,15 @@ final class BarPanelController {
         let name = app.localizedName ?? item.ownerName
 
         let alert = NSAlert()
-        alert.messageText = force ? "Принудительно завершить \(name)?" : "Завершить \(name)?"
+        alert.messageText = force
+            ? Localization.tr(.alertForceQuitTitle, name)
+            : Localization.tr(.alertQuitTitle, name)
         alert.informativeText = force
-            ? "Приложение будет закрыто сразу, без возможности сохранить данные."
-            : "Приложение получит обычный запрос на завершение. Несохранённые данные могут быть потеряны."
+            ? Localization.tr(.alertForceQuitMessage)
+            : Localization.tr(.alertQuitMessage)
         alert.alertStyle = .warning
-        alert.addButton(withTitle: force ? "Завершить принудительно" : "Завершить")
-        alert.addButton(withTitle: "Отмена")
+        alert.addButton(withTitle: force ? Localization.tr(.buttonForceQuit) : Localization.tr(.buttonQuit))
+        alert.addButton(withTitle: Localization.tr(.buttonCancel))
 
         let response = alert.runModal()
         guard response == .alertFirstButtonReturn else {

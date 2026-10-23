@@ -14,11 +14,12 @@ final class MenuBarLayoutController {
         case hidden
         case alwaysHidden
 
+        @MainActor
         var title: String {
             switch self {
-            case .visible: "Видимые"
-            case .hidden: "Скрытые"
-            case .alwaysHidden: "Всегда скрытые"
+            case .visible: Localization.tr(.sectionVisible)
+            case .hidden: Localization.tr(.sectionHidden)
+            case .alwaysHidden: Localization.tr(.sectionAlwaysHidden)
             }
         }
     }

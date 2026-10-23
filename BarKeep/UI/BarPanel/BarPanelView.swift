@@ -9,6 +9,7 @@ struct BarPanelView: View {
     let onQuitApp: (_ item: MenuBarItem, _ force: Bool) -> Void
     let onClose: () -> Void
 
+    @ObservedObject private var localization = Localization.shared
     @State private var query = ""
     @FocusState private var searchFocused: Bool
 
@@ -47,7 +48,7 @@ struct BarPanelView: View {
     private var iconRow: some View {
         HStack(spacing: 3) {
             if filteredItems.isEmpty {
-                Text("Ничего не найдено")
+                Text(Localization.tr(.noItemsFound))
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 10)
@@ -97,23 +98,23 @@ struct BarPanelView: View {
         .buttonStyle(.plain)
         .help(item.displayName)
         .contextMenu {
-            Button("Активировать") {
+            Button(Localization.tr(.activate)) {
                 onActivate(item)
             }
 
-            Button("Скрыть \(appName)") {
+            Button(Localization.tr(.hideAppName, appName)) {
                 onHideApp(item)
             }
             .disabled(!canManage)
 
             Divider()
 
-            Button("Завершить \(appName)…") {
+            Button(Localization.tr(.quitAppName, appName)) {
                 onQuitApp(item, false)
             }
             .disabled(!canManage)
 
-            Button("Завершить принудительно…") {
+            Button(Localization.tr(.forceQuitAppName, appName)) {
                 onQuitApp(item, true)
             }
             .disabled(!canManage)
@@ -128,7 +129,7 @@ struct BarPanelView: View {
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
 
-            TextField("Поиск", text: $query)
+            TextField(Localization.tr(.searchPlaceholder), text: $query)
                 .textFieldStyle(.plain)
                 .font(.system(size: 13))
                 .focused($searchFocused)
@@ -195,27 +196,27 @@ struct BarPanelView: View {
         result.reserveCapacity(value.count)
         for character in value {
             switch character {
-            case "а": result += "a"
+            case "а", "ә": result += "a"
             case "б": result += "b"
             case "в": result += "v"
-            case "г": result += "g"
+            case "г", "ғ": result += "g"
             case "д": result += "d"
             case "е", "ё", "э": result += "e"
             case "ж": result += "zh"
             case "з": result += "z"
-            case "и", "й": result += "i"
-            case "к": result += "k"
+            case "и", "й", "і": result += "i"
+            case "к", "қ": result += "k"
             case "л": result += "l"
             case "м": result += "m"
-            case "н": result += "n"
-            case "о": result += "o"
+            case "н", "ң": result += "n"
+            case "о", "ө": result += "o"
             case "п": result += "p"
             case "р": result += "r"
             case "с": result += "s"
             case "т": result += "t"
-            case "у": result += "u"
+            case "у", "ұ", "ү": result += "u"
             case "ф": result += "f"
-            case "х": result += "h"
+            case "х", "һ": result += "h"
             case "ц": result += "ts"
             case "ч": result += "ch"
             case "ш": result += "sh"

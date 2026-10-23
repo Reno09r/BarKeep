@@ -36,7 +36,19 @@ final class StatusItemController: NSObject, NSMenuDelegate {
             button.action = #selector(statusItemClicked)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appLanguageDidChange),
+            name: .appLanguageDidChange,
+            object: nil
+        )
+
         reload()
+    }
+
+    @objc private func appLanguageDidChange() {
+        rebuild(menu)
     }
 
     @objc private func statusItemClicked() {
@@ -77,13 +89,13 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.removeAllItems()
 
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1"
-        let header = NSMenuItem(title: "BarKeep \(version)", action: nil, keyEquivalent: "")
+        let header = NSMenuItem(title: Localization.tr(.appVersion, version), action: nil, keyEquivalent: "")
         header.isEnabled = false
         menu.addItem(header)
 
         if let conflict = AppEnvironment.conflictingManagerName {
             let warning = NSMenuItem(
-                title: "⚠︎ Обнаружен \(conflict): возможны конфликты",
+                title: Localization.tr(.conflictWarning, conflict),
                 action: nil,
                 keyEquivalent: ""
             )
@@ -92,21 +104,23 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         }
 
         menu.addItem(.separator())
-        menu.addItem(ClosureMenuItem(title: "Панель скрытых", keyEquivalent: "p") { [weak self] in
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.hiddenPanel), keyEquivalent: "p") { [weak self] in
             self?.panel.toggle()
         })
-        menu.addItem(ClosureMenuItem(title: "Обновить список", keyEquivalent: "r") { [weak self] in
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.refreshList), keyEquivalent: "r") { [weak self] in
             self?.reload()
         })
 
         // Секции
-        let hiddenTitle = layout.isHiddenSectionCollapsed ? "Скрыть скрытые иконки" : "Показать скрытые иконки"
+        let hiddenTitle = layout.isHiddenSectionCollapsed
+            ? Localization.tr(.hideHiddenIcons)
+            : Localization.tr(.showHiddenIcons)
         menu.addItem(ClosureMenuItem(title: hiddenTitle, keyEquivalent: "h") { [weak self] in
             self?.layout.toggle(.hidden)
         })
 
         let hoverItem = NSMenuItem(
-            title: "Показывать при наведении",
+            title: Localization.tr(.showOnHover),
             action: #selector(toggleHoverReveal),
             keyEquivalent: ""
         )
@@ -114,7 +128,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         hoverItem.state = hover.isEnabled ? .on : .off
         menu.addItem(hoverItem)
 
-        menu.addItem(ClosureMenuItem(title: "Вернуть все иконки") { [weak self] in
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.restoreAllIcons)) { [weak self] in
             self?.layout.resetAll()
         })
 
@@ -122,7 +136,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
         let itemsMenu = NSMenu()
         if items.isEmpty {
-            let empty = NSMenuItem(title: "Ничего не найдено", action: nil, keyEquivalent: "")
+            let empty = NSMenuItem(title: Localization.tr(.noItemsFound), action: nil, keyEquivalent: "")
             empty.isEnabled = false
             itemsMenu.addItem(empty)
         } else {
@@ -144,7 +158,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
         let visibleCount = items.filter { layout.section(forX: $0.frame.minX) == .visible }.count
         let itemsParent = NSMenuItem(
-            title: "Иконки: видимых \(visibleCount) из \(items.count)",
+            title: Localization.tr(.iconsCount, visibleCount, items.count),
             action: nil,
             keyEquivalent: ""
         )
@@ -154,30 +168,56 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         menu.addItem(ClosureMenuItem(
-            title: permissions.accessibility ? "Accessibility: ✓" : "Accessibility: не выдано — открыть настройки"
+            title: permissions.accessibility
+                ? Localization.tr(.accessibilityOk)
+                : Localization.tr(.accessibilityMissing)
         ) { [weak self] in
             self?.permissions.requestAccessibility()
         })
 
         menu.addItem(ClosureMenuItem(
-            title: permissions.screenRecording ? "Запись экрана: ✓" : "Запись экрана: не выдано — открыть настройки"
+            title: permissions.screenRecording
+                ? Localization.tr(.screenRecordingOk)
+                : Localization.tr(.screenRecordingMissing)
         ) { [weak self] in
             self?.permissions.requestScreenRecording()
         })
 
         menu.addItem(.separator())
 
-        menu.addItem(ClosureMenuItem(title: "Скопировать отчёт в буфер") { [weak self] in
+        // Язык / Language
+        let languageMenu = NSMenu()
+        for lang in AppLanguage.allCases {
+            let langItem = NSMenuItem(title: lang.displayName, action: #selector(languageSelected(_:)), keyEquivalent: "")
+            langItem.target = self
+            langItem.representedObject = lang
+            langItem.state = (Localization.shared.current == lang) ? .on : .off
+            languageMenu.addItem(langItem)
+        }
+        let languageParent = NSMenuItem(
+            title: "\(Localization.tr(.language)): \(Localization.shared.current.displayName)",
+            action: nil,
+            keyEquivalent: ""
+        )
+        languageParent.submenu = languageMenu
+        menu.addItem(languageParent)
+
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.copyReport)) { [weak self] in
             self?.copyReport()
         })
-        menu.addItem(ClosureMenuItem(title: "Открыть журнал") {
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.openLog)) {
             Log.revealInFinder()
         })
 
         menu.addItem(.separator())
-        menu.addItem(ClosureMenuItem(title: "Выйти") {
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.quitApp)) {
             NSApp.terminate(nil)
         })
+    }
+
+    @objc private func languageSelected(_ sender: NSMenuItem) {
+        guard let lang = sender.representedObject as? AppLanguage else { return }
+        Localization.shared.setLanguage(lang)
     }
 
     @objc private func toggleHoverReveal() {
@@ -195,15 +235,22 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     }
 
     private func copyReport() {
+        let hiddenState = layout.isHiddenSectionCollapsed
+            ? Localization.tr(.reportStateShown)
+            : Localization.tr(.reportStateHidden)
+        let alwaysHiddenState = layout.isAlwaysHiddenSectionCollapsed
+            ? Localization.tr(.reportStateShown)
+            : Localization.tr(.reportStateHidden)
+
         var lines: [String] = [
             "BarKeep \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?")",
             "macOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
             AppEnvironment.summary,
-            "Элементов: \(items.count)",
-            "Скрытые: \(layout.isHiddenSectionCollapsed ? "показаны" : "спрятаны"), всегда-скрытые: \(layout.isAlwaysHiddenSectionCollapsed ? "показаны" : "спрятаны")",
+            Localization.tr(.reportItems, items.count),
+            "\(Localization.tr(.reportHidden, hiddenState)), \(Localization.tr(.reportAlwaysHidden, alwaysHiddenState))",
         ]
         if let hidden = layout.hiddenFrame, let alwaysHidden = layout.alwaysHiddenFrame {
-            lines.append("Разделители: hidden.minX=\(Int(hidden.minX)) alwaysHidden.minX=\(Int(alwaysHidden.minX))")
+            lines.append(Localization.tr(.reportDividers, Int(hidden.minX), Int(alwaysHidden.minX)))
         }
         for item in items {
             lines.append(String(
@@ -220,6 +267,6 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let text = lines.joined(separator: "\n")
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        Log.info("Отчёт скопирован в буфер (\(items.count) строк)")
+        Log.info(Localization.tr(.reportCopied, items.count))
     }
 }

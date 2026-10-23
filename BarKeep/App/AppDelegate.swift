@@ -118,16 +118,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
 
         let alert = NSAlert()
-        alert.messageText = "BarKeep нужен доступ к Accessibility"
-        alert.informativeText = """
-        Без этого разрешения BarKeep не сможет нажимать на иконки меню-бара и перемещать их.
-
-        Открой «Системные настройки → Конфиденциальность и безопасность → Accessibility» \
-        и включи BarKeep. После выдачи доступ применится автоматически.
-        """
+        alert.messageText = Localization.tr(.onboardingAccessibilityTitle)
+        alert.informativeText = Localization.tr(.onboardingAccessibilityMessage)
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "Открыть настройки")
-        alert.addButton(withTitle: "Позже")
+        alert.addButton(withTitle: Localization.tr(.buttonOpenSettings))
+        alert.addButton(withTitle: Localization.tr(.buttonLater))
 
         if alert.runModal() == .alertFirstButtonReturn {
             permissions.requestAccessibility()
