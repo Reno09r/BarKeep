@@ -1,4 +1,4 @@
-.PHONY: gen build run stop clean logs report signing test
+.PHONY: gen build run stop clean logs report signing test dmg
 
 APP := build/Build/Products/Debug/BarKeep.app
 KEYCHAIN := $(HOME)/Library/Keychains/barkeep-dev.keychain-db
@@ -31,8 +31,12 @@ test: gen
 		CODE_SIGNING_REQUIRED=NO \
 		test
 
+dmg: build
+	@bash scripts/build-dmg.sh
+
 run: build
 	@pkill -x BarKeep 2>/dev/null || true
+	@sleep 0.5
 	open "$(APP)"
 
 stop:

@@ -69,4 +69,22 @@ final class BarKeepTests: XCTestCase {
         )
         XCTAssertFalse(AppTerminator.canManage(item: appleItem))
     }
+
+    func testControlIconStyles() {
+        for style in ControlIconStyle.allCases {
+            XCTAssertFalse(style.title.isEmpty)
+            XCTAssertNotNil(style.image(), "Стиль \(style.rawValue) должен генерировать иконку")
+        }
+    }
+
+    func testLocalizationKeys() {
+        for lang in AppLanguage.allCases {
+            Localization.shared.setLanguage(lang)
+            XCTAssertFalse(Localization.tr(.launchAtLogin).isEmpty)
+            XCTAssertFalse(Localization.tr(.preferences).isEmpty)
+            XCTAssertFalse(Localization.tr(.iconStyle).isEmpty)
+            XCTAssertFalse(Localization.tr(.alwaysHiddenEnabled).isEmpty)
+        }
+        Localization.shared.setLanguage(.en)
+    }
 }

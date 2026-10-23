@@ -66,6 +66,14 @@ public final class Localization: ObservableObject {
         case openLog = "open_log"
         case language = "language"
         case quitApp = "quit_app"
+        case launchAtLogin = "launch_at_login"
+        case preferences = "preferences"
+        case generalTab = "general_tab"
+        case iconTab = "icon_tab"
+        case permissionsTab = "permissions_tab"
+        case aboutTab = "about_tab"
+        case iconStyle = "icon_style"
+        case alwaysHiddenEnabled = "always_hidden_enabled"
 
         case sectionVisible = "section_visible"
         case sectionHidden = "section_hidden"
@@ -119,6 +127,14 @@ public final class Localization: ObservableObject {
             .openLog: "Open Log",
             .language: "Language",
             .quitApp: "Quit BarKeep",
+            .launchAtLogin: "Launch at Login",
+            .preferences: "Settings…",
+            .generalTab: "General",
+            .iconTab: "Menu Bar Icon",
+            .permissionsTab: "Permissions",
+            .aboutTab: "About",
+            .iconStyle: "Icon Style",
+            .alwaysHiddenEnabled: "Enable Always-Hidden Section",
 
             .sectionVisible: "Visible",
             .sectionHidden: "Hidden",
@@ -170,6 +186,14 @@ public final class Localization: ObservableObject {
             .openLog: "Открыть журнал",
             .language: "Язык",
             .quitApp: "Выйти из BarKeep",
+            .launchAtLogin: "Запуск при входе в систему",
+            .preferences: "Настройки…",
+            .generalTab: "Основные",
+            .iconTab: "Иконка в меню",
+            .permissionsTab: "Разрешения",
+            .aboutTab: "О программе",
+            .iconStyle: "Стиль иконки",
+            .alwaysHiddenEnabled: "Включить секцию «Всегда скрытые»",
 
             .sectionVisible: "Видимые",
             .sectionHidden: "Скрытые",
@@ -221,6 +245,14 @@ public final class Localization: ObservableObject {
             .openLog: "Журналды ашу",
             .language: "Тіл",
             .quitApp: "BarKeep бағдарламасынан шығу",
+            .launchAtLogin: "Жүйеге кіргенде іске қосу",
+            .preferences: "Баптаулар…",
+            .generalTab: "Негізгі",
+            .iconTab: "Мәзір белгішесі",
+            .permissionsTab: "Рұқсаттар",
+            .aboutTab: "Бағдарлама туралы",
+            .iconStyle: "Белгіше стилі",
+            .alwaysHiddenEnabled: "«Әрқашан жасырын» бөлімін қосу",
 
             .sectionVisible: "Көрінетін",
             .sectionHidden: "Жасырын",
@@ -272,6 +304,14 @@ public final class Localization: ObservableObject {
             .openLog: "打开日志文件",
             .language: "语言",
             .quitApp: "退出 BarKeep",
+            .launchAtLogin: "登录时启动",
+            .preferences: "设置…",
+            .generalTab: "通用",
+            .iconTab: "菜单栏图标",
+            .permissionsTab: "权限",
+            .aboutTab: "关于",
+            .iconStyle: "图标样式",
+            .alwaysHiddenEnabled: "启用始终隐藏区域",
 
             .sectionVisible: "可见",
             .sectionHidden: "已隐藏",

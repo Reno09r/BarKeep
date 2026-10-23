@@ -51,6 +51,7 @@ final class BarPanelController {
         let size = panelSize()
         let view = BarPanelView(
             items: items,
+            sectionProvider: { [weak self] item in self?.layout.section(forX: item.frame.minX) ?? .hidden },
             imageProvider: { [weak self] item in self?.images.image(for: item) },
             onActivate: { [weak self] item in
                 self?.close(restoreFocus: false)

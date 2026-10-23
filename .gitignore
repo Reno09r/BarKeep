@@ -3,6 +3,7 @@ BarKeep.xcodeproj/
 
 # Сборка
 build/
+dist/
 .build/
 DerivedData/
 *.xcresult

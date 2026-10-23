@@ -3,6 +3,7 @@ import SwiftUI
 @MainActor
 struct BarPanelView: View {
     let items: [MenuBarItem]
+    var sectionProvider: ((MenuBarItem) -> MenuBarLayoutController.Section)? = nil
     let imageProvider: (MenuBarItem) -> NSImage?
     let onActivate: (MenuBarItem) -> Void
     let onHideApp: (MenuBarItem) -> Void
@@ -11,6 +12,8 @@ struct BarPanelView: View {
 
     @ObservedObject private var localization = Localization.shared
     @State private var query = ""
+    @State private var selectedIndex: Int = 0
+    @State private var filterAlwaysHidden = false
     @FocusState private var searchFocused: Bool
 
     var body: some View {
@@ -41,6 +44,21 @@ struct BarPanelView: View {
             }
         }
         .onExitCommand { onClose() }
+        .onKeyPress(.leftArrow) {
+            guard !filteredItems.isEmpty else { return .ignored }
+            selectedIndex = max(0, selectedIndex - 1)
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            guard !filteredItems.isEmpty else { return .ignored }
+            selectedIndex = min(filteredItems.count - 1, selectedIndex + 1)
+            return .handled
+        }
+        .onKeyPress(.return) {
+            guard selectedIndex >= 0 && selectedIndex < filteredItems.count else { return .ignored }
+            onActivate(filteredItems[selectedIndex])
+            return .handled
+        }
     }
 
     // MARK: - Иконки
@@ -53,8 +71,8 @@ struct BarPanelView: View {
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 10)
             } else {
-                ForEach(filteredItems) { item in
-                    iconButton(for: item)
+                ForEach(Array(filteredItems.enumerated()), id: \.element.id) { index, item in
+                    iconButton(for: item, isSelected: index == selectedIndex)
                 }
             }
         }
@@ -80,7 +98,7 @@ struct BarPanelView: View {
         return totalItemsWidth + CGFloat(filteredItems.count - 1) * 3 + 16
     }
 
-    private func iconButton(for item: MenuBarItem) -> some View {
+    private func iconButton(for item: MenuBarItem, isSelected: Bool) -> some View {
         let canManage = AppTerminator.canManage(item: item)
         let appName = AppTerminator.displayName(for: item)
         let width = itemWidth(for: item)
@@ -90,7 +108,11 @@ struct BarPanelView: View {
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.primary.opacity(0.06))
+                    .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.06))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
+                    )
 
                 if let image = imageProvider(item) {
                     Image(nsImage: image)
@@ -145,8 +167,15 @@ struct BarPanelView: View {
                 .textFieldStyle(.plain)
                 .font(.system(size: 13))
                 .focused($searchFocused)
+                .onChange(of: query) { _, _ in
+                    selectedIndex = 0
+                }
                 .onSubmit {
-                    if let first = filteredItems.first { onActivate(first) }
+                    if selectedIndex >= 0 && selectedIndex < filteredItems.count {
+                        onActivate(filteredItems[selectedIndex])
+                    } else if let first = filteredItems.first {
+                        onActivate(first)
+                    }
                 }
 
             if !query.isEmpty {
@@ -159,6 +188,19 @@ struct BarPanelView: View {
                 }
                 .buttonStyle(.plain)
             }
+
+            if hasAlwaysHiddenItems {
+                Button {
+                    filterAlwaysHidden.toggle()
+                    selectedIndex = 0
+                } label: {
+                    Image(systemName: filterAlwaysHidden ? "eye.slash.fill" : "eye.slash")
+                        .font(.system(size: 12))
+                        .foregroundStyle(filterAlwaysHidden ? Color.accentColor : Color.secondary)
+                }
+                .buttonStyle(.plain)
+                .help(Localization.tr(.sectionAlwaysHidden))
+            }
         }
         .padding(.horizontal, 9)
         .frame(width: 165, height: 30)
@@ -168,14 +210,29 @@ struct BarPanelView: View {
         )
     }
 
+    private var hasAlwaysHiddenItems: Bool {
+        guard let sectionProvider else { return false }
+        return items.contains { sectionProvider($0) == .alwaysHidden }
+    }
+
+    private var baseItems: [MenuBarItem] {
+        guard let sectionProvider, hasAlwaysHiddenItems else { return items }
+        if filterAlwaysHidden {
+            return items.filter { sectionProvider($0) == .alwaysHidden }
+        } else {
+            return items.filter { sectionProvider($0) != .alwaysHidden }
+        }
+    }
+
     private var filteredItems: [MenuBarItem] {
+        let base = baseItems
         let tokens = Self.normalized(query)
             .split(separator: " ")
             .map(String.init)
             .filter { !$0.isEmpty }
-        guard !tokens.isEmpty else { return items }
+        guard !tokens.isEmpty else { return base }
 
-        return items.filter { item in
+        return base.filter { item in
             let haystack = Self.searchText(for: item)
             let transliterated = Self.transliterate(haystack)
             return tokens.allSatisfy { token in

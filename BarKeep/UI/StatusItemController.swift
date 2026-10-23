@@ -134,6 +134,15 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         hoverItem.state = hover.isEnabled ? .on : .off
         menu.addItem(hoverItem)
 
+        let loginItem = NSMenuItem(
+            title: Localization.tr(.launchAtLogin),
+            action: #selector(toggleLaunchAtLogin),
+            keyEquivalent: ""
+        )
+        loginItem.target = self
+        loginItem.state = LaunchAtLoginService.shared.isEnabled ? .on : .off
+        menu.addItem(loginItem)
+
         menu.addItem(ClosureMenuItem(title: Localization.tr(.restoreAllIcons)) { [weak self] in
             self?.layout.resetAll()
         })
@@ -208,11 +217,32 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         languageParent.submenu = languageMenu
         menu.addItem(languageParent)
 
+        // Стиль иконки BarKeep
+        let iconStyleMenu = NSMenu()
+        for style in ControlIconStyle.allCases {
+            let styleItem = NSMenuItem(title: style.title, action: #selector(iconStyleSelected(_:)), keyEquivalent: "")
+            styleItem.target = self
+            styleItem.representedObject = style
+            styleItem.state = (layout.currentIconStyle == style) ? .on : .off
+            iconStyleMenu.addItem(styleItem)
+        }
+        let iconStyleParent = NSMenuItem(
+            title: Localization.tr(.iconStyle),
+            action: nil,
+            keyEquivalent: ""
+        )
+        iconStyleParent.submenu = iconStyleMenu
+        menu.addItem(iconStyleParent)
+
         menu.addItem(ClosureMenuItem(title: Localization.tr(.copyReport)) { [weak self] in
             self?.copyReport()
         })
         menu.addItem(ClosureMenuItem(title: Localization.tr(.openLog)) {
             Log.revealInFinder()
+        })
+
+        menu.addItem(ClosureMenuItem(title: Localization.tr(.preferences), keyEquivalent: ",") { [weak self] in
+            self?.openSettings()
         })
 
         menu.addItem(.separator())
@@ -221,15 +251,36 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         })
     }
 
+    private func openSettings() {
+        SettingsWindowController.show(permissions: permissions, layout: layout, hover: hover)
+    }
+
     @objc private func languageSelected(_ sender: NSMenuItem) {
         guard let lang = sender.representedObject as? AppLanguage else { return }
         Localization.shared.setLanguage(lang)
     }
 
+    @objc private func iconStyleSelected(_ sender: NSMenuItem) {
+        guard let style = sender.representedObject as? ControlIconStyle else { return }
+        layout.currentIconStyle = style
+        rebuild(menu)
+    }
+
     @objc private func toggleHoverReveal() {
         let key = "BarKeepHoverReveal"
-        let current = UserDefaults.standard.object(forKey: key) as? Bool ?? true
+        let current = UserDefaults.standard.object(forKey: key) as? Bool ?? false
         UserDefaults.standard.set(!current, forKey: key)
+        if !current {
+            hover.start()
+        } else {
+            hover.stop()
+        }
+        rebuild(menu)
+    }
+
+    @objc private func toggleLaunchAtLogin() {
+        LaunchAtLoginService.shared.toggle()
+        rebuild(menu)
     }
 
     private func activate(_ item: MenuBarItem) {

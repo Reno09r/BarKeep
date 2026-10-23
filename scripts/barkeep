@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# BarKeep Command Line Interface
+# Управляет запущенным экземпляром BarKeep через DistributedNotificationCenter.
+
+ACTION="${1:-panel}"
+
+case "$ACTION" in
+    panel|toggle|show|hide|reset|quit|help|--help|-h)
+        ;;
+    activate:*)
+        ;;
+    *)
+        echo "Usage: barkeep [command]"
+        echo ""
+        echo "Commands:"
+        echo "  panel         Toggle the floating HUD panel (default)"
+        echo "  toggle        Toggle hidden icons section in menu bar"
+        echo "  show          Show hidden icons in menu bar"
+        echo "  hide          Hide icons in menu bar"
+        echo "  reset         Emergency reset all dividers"
+        echo "  activate:<app> Activate specified app menu bar item"
+        echo "  quit          Quit BarKeep application"
+        exit 1
+        ;;
+esac
+
+if [[ "$ACTION" == "help" || "$ACTION" == "--help" || "$ACTION" == "-h" ]]; then
+    echo "Usage: barkeep [command]"
+    echo ""
+    echo "Commands:"
+    echo "  panel         Toggle the floating HUD panel"
+    echo "  toggle        Toggle hidden icons section"
+    echo "  show          Show hidden icons"
+    echo "  hide          Hide icons"
+    echo "  reset         Emergency reset all dividers"
+    echo "  activate:<app> Activate specified app menu bar item"
+    echo "  quit          Quit BarKeep"
+    exit 0
+fi
+
+# Сопоставление команд с шиной BarKeep
+BUS_ACTION="$ACTION"
+if [[ "$ACTION" == "toggle" ]]; then
+    BUS_ACTION="toggleHidden"
+elif [[ "$ACTION" == "show" ]]; then
+    BUS_ACTION="showHidden"
+elif [[ "$ACTION" == "hide" ]]; then
+    BUS_ACTION="hideHidden"
+fi
+
+swift - "$BUS_ACTION" << 'EOF'
+import Foundation
+
+guard CommandLine.arguments.count > 1 else { exit(0) }
+let action = CommandLine.arguments[1]
+let name = Notification.Name("com.reno.barkeep.command")
+DistributedNotificationCenter.default().postNotificationName(
+    name,
+    object: nil,
+    userInfo: ["action": action],
+    deliverImmediately: true
+)
+EOF

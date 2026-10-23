@@ -34,9 +34,50 @@ final class MenuBarLayoutController {
     private(set) var isHiddenSectionCollapsed = false
     private(set) var isAlwaysHiddenSectionCollapsed = false
 
-    /// Секция «всегда скрытые» требует ручного перемещения иконок за её границу.
-    /// Пока перемещение недоступно, секция выключена и не влияет на классификацию.
-    private(set) var isAlwaysHiddenEnabled = false
+    private static let alwaysHiddenEnabledKey = "BarKeepAlwaysHiddenEnabled"
+
+    var isAlwaysHiddenEnabled: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Self.alwaysHiddenEnabledKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Self.alwaysHiddenEnabledKey)
+            if newValue {
+                Self.configureDivider(alwaysHiddenDivider)
+                alwaysHiddenDivider.length = Self.collapsedLength
+            } else {
+                Self.configureInactiveDivider(alwaysHiddenDivider)
+                alwaysHiddenDivider.length = 1
+            }
+        }
+    }
+
+    func setAlwaysHidden(enabled: Bool) {
+        isAlwaysHiddenEnabled = enabled
+    }
+
+    private static let iconStyleKey = "BarKeepControlIconStyle"
+
+    var currentIconStyle: ControlIconStyle {
+        get {
+            guard let raw = UserDefaults.standard.string(forKey: Self.iconStyleKey),
+                  let style = ControlIconStyle(rawValue: raw) else {
+                return .rectangle
+            }
+            return style
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: Self.iconStyleKey)
+            updateControlIcon()
+        }
+    }
+
+    func updateControlIcon() {
+        guard let button = controlItem.button else { return }
+        let image = currentIconStyle.image()
+        button.image = image
+        button.title = (image == nil) ? "BK" : ""
+    }
 
     init() {
         Self.installPreferredPositionsIfNeeded()
@@ -44,10 +85,6 @@ final class MenuBarLayoutController {
         controlItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         controlItem.autosaveName = "BKControl"
         if let button = controlItem.button {
-            let image = NSImage(systemSymbolName: "menubar.rectangle", accessibilityDescription: "BarKeep")
-            image?.isTemplate = true
-            button.image = image
-            if button.image == nil { button.title = "BK" }
             button.toolTip = "BarKeep"
         }
 
@@ -57,7 +94,14 @@ final class MenuBarLayoutController {
 
         alwaysHiddenDivider = NSStatusBar.system.statusItem(withLength: 1)
         alwaysHiddenDivider.autosaveName = "BKAlwaysHidden"
-        Self.configureInactiveDivider(alwaysHiddenDivider)
+        if isAlwaysHiddenEnabled {
+            Self.configureDivider(alwaysHiddenDivider)
+            alwaysHiddenDivider.length = Self.collapsedLength
+        } else {
+            Self.configureInactiveDivider(alwaysHiddenDivider)
+        }
+
+        updateControlIcon()
 
         logFrames("после создания")
 
