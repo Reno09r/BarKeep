@@ -55,18 +55,33 @@ Built natively in **Swift, AppKit, and SwiftUI** with zero third-party dependenc
 ## Requirements
 
 - **macOS 14.0 (Sonoma)** or later (tested on macOS 15 Sequoia, Apple Silicon and Intel).
-- **Xcode 15.0+** and Command Line Tools.
-- **[XcodeGen](https://github.com/yonaskolb/XcodeGen)** (`brew install xcodegen`).
-- No paid Apple Developer account needed: uses a local self-signed certificate.
+- **Xcode 15.0+** and Command Line Tools (for building from source).
+- No paid Apple Developer account needed.
 
 ---
 
-## Quick Start & Build
+## Installation
+
+### Via Homebrew
+
+```bash
+brew tap reno09r/barkeep
+brew install --cask barkeep
+```
+
+*Or install directly in one command:*
+```bash
+brew install reno09r/barkeep/barkeep
+```
+
+---
+
+## Quick Start & Build (From Source)
 
 Clone the repository and build the debug app:
 
 ```bash
-git clone https://github.com/your-username/BarKeep.git
+git clone https://github.com/Reno09r/BarKeep.git
 cd BarKeep
 
 # 1. Generate local development signing certificate (first time only)

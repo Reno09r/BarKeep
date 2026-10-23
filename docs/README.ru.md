@@ -61,12 +61,28 @@
 
 ---
 
-## Быстрый старт и сборка
+## Установка
+
+### Через Homebrew
+
+```bash
+brew tap reno09r/barkeep
+brew install --cask barkeep
+```
+
+*Или одной командой:*
+```bash
+brew install reno09r/barkeep/barkeep
+```
+
+---
+
+## Быстрый старт и сборка из исходников
 
 Склонируйте репозиторий и соберите проект:
 
 ```bash
-git clone https://github.com/your-username/BarKeep.git
+git clone https://github.com/Reno09r/BarKeep.git
 cd BarKeep
 
 # 1. Создать локальный сертификат подписи разработчика (только один раз)
