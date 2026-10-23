@@ -66,13 +66,15 @@ Built natively in **Swift, AppKit, and SwiftUI** with zero third-party dependenc
 
 ```bash
 brew tap reno09r/barkeep
-brew install --cask barkeep
+brew install --cask --no-quarantine barkeep
 ```
 
 *Or install directly in one command:*
 ```bash
-brew install reno09r/barkeep/barkeep
+brew install --cask --no-quarantine reno09r/barkeep/barkeep
 ```
+
+> **Note on Gatekeeper:** BarKeep is signed with a local developer certificate (to keep it free and open-source without a $99/year Apple account). If macOS blocks it on first launch, either pass `--no-quarantine` during install, run `xattr -cr /Applications/BarKeep.app`, or go to **System Settings → Privacy & Security** and click **Open Anyway**.
 
 ---
 

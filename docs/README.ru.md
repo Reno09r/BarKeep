@@ -67,13 +67,15 @@
 
 ```bash
 brew tap reno09r/barkeep
-brew install --cask barkeep
+brew install --cask --no-quarantine barkeep
 ```
 
 *Или одной командой:*
 ```bash
-brew install reno09r/barkeep/barkeep
+brew install --cask --no-quarantine reno09r/barkeep/barkeep
 ```
+
+> **Примечание по Gatekeeper:** BarKeep подписан локальным сертификатом разработчика (чтобы оставаться бесплатным и открытым без платной подписки Apple за $99/год). Если macOS блокирует первый запуск, установите с флагом `--no-quarantine`, либо выполните в терминале `xattr -cr /Applications/BarKeep.app`, либо нажмите **«Всё равно открыть»** в **Системные настройки → Конфиденциальность и безопасность**.
 
 ---
 
